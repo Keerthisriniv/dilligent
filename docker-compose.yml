@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix
+      POSTGRES_DB: zabbix
+    volumes:
+      - zbx-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zabbix"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  zabbix-server:
+    build:
+      context: ./docker/zabbix-server
+    depends_on:
+      - postgres
+    environment:
+      DB_SERVER_HOST: postgres
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix
+      POSTGRES_DB: zabbix
+      ZBX_LOADMODULE: ""
+    volumes:
+      - ./scripts:/usr/lib/zabbix/externalscripts:ro
+    ports:
+      - "10051:10051"
+
+  zabbix-web:
+    image: zabbix/zabbix-web-apache-pgsql:alpine-6.4-latest
+    depends_on:
+      - zabbix-server
+      - postgres
+    environment:
+      DB_SERVER_HOST: postgres
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix
+      POSTGRES_DB: zabbix
+      PHP_TZ: UTC
+    ports:
+      - "8080:8080"
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    depends_on:
+      - zabbix-server
+    environment:
+      GF_INSTALL_PLUGINS: alexanderzobnin-zabbix-app
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+
+  alarm-lifecycle:
+    build:
+      context: ./services/alarm-lifecycle
+    environment:
+      PORT: "8081"
+    ports:
+      - "8081:8081"
+
+volumes:
+  zbx-pgdata:
+
+

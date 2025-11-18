@@ -1,0 +1,18 @@
+{
+  "apiVersion": 1,
+  "providers": [
+    {
+      "name": "zabbix-starter",
+      "orgId": 1,
+      "folder": "Healthcare NMS",
+      "type": "file",
+      "disableDeletion": false,
+      "editable": true,
+      "options": {
+        "path": "/etc/grafana/provisioning/dashboards/_definitions"
+      }
+    }
+  ]
+}
+
+

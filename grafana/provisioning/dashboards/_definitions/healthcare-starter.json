@@ -1,0 +1,52 @@
+{
+  "title": "Healthcare IoT Monitoring (Starter)",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "bargauge",
+      "title": "NETCONF Get Payload Size",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "refId": "A",
+          "group": { "filter": "{host}" },
+          "item": { "filter": "NETCONF get size" },
+          "datasource": { "type": "alexanderzobnin-zabbix-datasource", "uid": "ZABBIX_DS" }
+        }
+      ]
+    },
+    {
+      "type": "state-timeline",
+      "title": "Device Uptime (SNMP)",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "refId": "B",
+          "group": { "filter": "{host}" },
+          "item": { "filter": "SNMP sysUpTime" },
+          "datasource": { "type": "alexanderzobnin-zabbix-datasource", "uid": "ZABBIX_DS" }
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Open Problems",
+      "gridPos": { "x": 0, "y": 8, "w": 6, "h": 6 },
+      "targets": [
+        {
+          "refId": "C",
+          "mode": 2,
+          "application": { "filter": "" },
+          "countProblems": true,
+          "datasource": { "type": "alexanderzobnin-zabbix-datasource", "uid": "ZABBIX_DS" }
+        }
+      ]
+    }
+  ]
+}
+
+
+

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+  <version>6.4</version>
+  <date>2025-10-22T00:00:00Z</date>
+  <groups>
+    <group>
+      <name>Templates/Healthcare</name>
+    </group>
+  </groups>
+  <templates>
+    <template>
+      <template>Template Healthcare IoT Monitoring</template>
+      <name>Template Healthcare IoT Monitoring</name>
+      <groups>
+        <group>
+          <name>Templates/Healthcare</name>
+        </group>
+      </groups>
+      <items>
+        <item>
+          <name>NETCONF hello</name>
+          <type>10</type>
+          <key>netconf_check.py[{HOST.IP},830,{$NETCONF.USER},{$NETCONF.PASS},hello]</key>
+          <delay>1m</delay>
+          <history>1d</history>
+          <trends>0</trends>
+          <value_type>4</value_type>
+        </item>
+        <item>
+          <name>NETCONF get size</name>
+          <type>10</type>
+          <key>netconf_check.py[{HOST.IP},830,{$NETCONF.USER},{$NETCONF.PASS},get]</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>90d</trends>
+          <value_type>3</value_type>
+          <preprocessing>
+            <step>
+              <type>12</type>
+              <parameters>
+                <parameter>$.len</parameter>
+              </parameters>
+            </step>
+          </preprocessing>
+        </item>
+        <item>
+          <name>SNMP sysUpTime</name>
+          <type>4</type>
+          <snmp_community>{$SNMP.COMMUNITY}</snmp_community>
+          <snmp_oid>1.3.6.1.2.1.1.3.0</snmp_oid>
+          <key>system.uptime[sysUpTime.0]</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>90d</trends>
+          <value_type>3</value_type>
+          <units>s</units>
+        </item>
+      </items>
+      <macros>
+        <macro>
+          <macro>{$SNMP.COMMUNITY}</macro>
+          <value>public</value>
+        </macro>
+        <macro>
+          <macro>{$NETCONF.USER}</macro>
+          <value>netconf</value>
+        </macro>
+        <macro>
+          <macro>{$NETCONF.PASS}</macro>
+          <value>netconf</value>
+        </macro>
+      </macros>
+      <triggers>
+        <trigger>
+          <expression>nodata(/Template Healthcare IoT Monitoring/netconf_check.py[{HOST.IP},830,{$NETCONF.USER},{$NETCONF.PASS},hello],5m)=1 or find(/Template Healthcare IoT Monitoring/netconf_check.py[{HOST.IP},830,{$NETCONF.USER},{$NETCONF.PASS},hello],,"regexp","\"ok\":\s*true")=0</expression>
+          <name>NETCONF not reachable</name>
+          <priority>4</priority>
+        </trigger>
+        <trigger>
+          <expression>last(/Template Healthcare IoT Monitoring/system.uptime[sysUpTime.0])&lt;300</expression>
+          <name>Device recently restarted (uptime &lt; 5m)</name>
+          <priority>2</priority>
+        </trigger>
+      </triggers>
+    </template>
+  </templates>
+</zabbix_export>
+
+
+

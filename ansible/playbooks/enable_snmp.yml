@@ -1,0 +1,33 @@
+---
+- name: Enable SNMP on Ubuntu hosts
+  hosts: ubuntu_hosts
+  become: true
+  tasks:
+    - name: Install SNMP daemon
+      apt:
+        name:
+          - snmpd
+        state: present
+        update_cache: yes
+
+    - name: Configure SNMP community (v2c) - demo only
+      lineinfile:
+        path: /etc/snmp/snmpd.conf
+        regexp: '^agentAddress'
+        line: 'agentAddress udp:161,udp6:[::1]:161'
+        state: present
+
+    - name: Ensure read community is set (demo community: public)
+      lineinfile:
+        path: /etc/snmp/snmpd.conf
+        regexp: '^rocommunity'
+        line: 'rocommunity public default -V systemonly'
+        create: yes
+
+    - name: Restart SNMP service
+      service:
+        name: snmpd
+        state: restarted
+        enabled: yes
+
+
